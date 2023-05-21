@@ -77,6 +77,15 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		HDC hdc = GetDC(window);
 		Input input = {0};
 
+		LARGE_INTEGER last_counter;
+		QueryPerformanceCounter(&last_counter);	
+		
+		LARGE_INTEGER frequency_counter_large;
+		QueryPerformanceFrequency(&frequency_counter_large);
+		f32 frequency_counter = (f32)frequency_counter_large.QuadPart;
+
+		f32 last_dt = 0.01666f;
+
 		while(running){
 			//Input
 			for(int i = 0; i < BUTTON_COUNT; i++) input.buttons[i].changed = false;
@@ -112,13 +121,20 @@ if(vk_code == vk){\
 
 			}
 			//Simulation
-			simulate_game(&input);
+			simulate_game(&input, last_dt);
 
 			//render
 			//after second w&h we call memory (what would be draw)
 			StretchDIBits(hdc, 0 ,0, render_buffer.width, render_buffer.height, 0, 0, render_buffer.width, render_buffer.height,
 										render_buffer.pixels, &render_buffer.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
-	
+			//Get the framerate
+			LARGE_INTEGER current_counter;
+			QueryPerformanceCounter(&current_counter);
+			last_dt = 
+			(f32)
+			(current_counter.QuadPart - last_counter.QuadPart) / 
+			frequency_counter;
+			last_counter = current_counter;
 		}
 
 		return 0;
